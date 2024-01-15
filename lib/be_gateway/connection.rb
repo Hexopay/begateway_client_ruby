@@ -45,6 +45,20 @@ module BeGateway
                 }
               }
             )
+          rescue Net::OpenTimeout => e
+            logger.error("Connection error to '#{path}': #{e}") if logger
+
+            OpenStruct.new(
+              status: 504,
+              body: {
+                'response' => {
+                  'message' => 'Timeout',
+                  'errors' => {
+                    'connection' => 'is timed out'
+                  }
+                }
+              }
+            )
           end
 
       logger.info("[beGateway client response body] #{r.body}") if logger
