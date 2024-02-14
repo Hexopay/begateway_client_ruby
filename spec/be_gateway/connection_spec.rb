@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'net/http'
 
 describe 'BeGateway::Connection' do
   class TestConnection
@@ -44,6 +45,15 @@ describe 'BeGateway::Connection' do
         .and_return(OpenStruct.new)
 
       subject
+    end
+
+    context 'when connection is timed out' do
+      it 'catches the error' do
+        expect(Faraday::Connection).to receive(:new).and_raise(Net::OpenTimeout)
+
+        expect(subject.response['message']).to eq('Timeout')
+        expect(subject.response['errors']['connection']).to eq('is timed out')
+      end
     end
   end
 
